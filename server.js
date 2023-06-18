@@ -2,6 +2,7 @@ require('dotenv/config');
 let express = require('express');
 let app = express();
 let bodyParser = require('body-parser');
+const cors = require('cors');
 
 let mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
@@ -38,13 +39,12 @@ app.use(function (req, res, next) {
 });
 
 // Pour les formulaires
+app.use(cors());  
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-
 // les routes
 const prefix = '/api';
-
 app.use('/auth',routerAuth.router) ; 
 app.use(prefix,routerAuth.CheckAuth) ; 
 app.use(prefix + '/assignments' , routerAssignments) ; 
