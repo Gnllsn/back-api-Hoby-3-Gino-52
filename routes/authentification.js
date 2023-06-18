@@ -40,16 +40,39 @@ async function findUser(user) {
 	return await User.findOne({name:user.name}) ; 
 }
 
-function login(request,response){
+async function checkPassword(response,user,existant){
+	const validPassword = await bcrypt.compare(user.password,existant.password)
+	if(!validPassword) return response.status(200).send({
+		status : 400,
+		message : 'Mot de passe incorrect'
+	});
+}
+
+async function generateToken(user) {
+	return await jwt.sign(user.name,process.env.SECRET_KEY) ; 
+}
+
+async function login(request,response){
     var user = request.body ; 
     checkBody(response,user) ; 
-    findUser(response,user);
+    const existant = await findUser(user);
+	if(!existant){
+		return response
+		.status(200)
+		.send({
+			status : 400 , 
+			message : "User introuvable !!!"
+		});
+	}
+	await checkPassword(response,user,existant) ; 
+	const token = await generateToken(user)
+	console.log(token)
     var result= {
-      status :  200 , 
-      data :  {
-        user : user , 
-        token : jwt.sign(user,process.env.SECRET_KEY)
-      }
+      status :  200 ,
+	  data : {
+		user : existant , 
+		token : token
+	  } 
     } ; 
     return response.send(result) ; 
 } 
@@ -68,7 +91,7 @@ async function register(request,response){
 	}
 	user = await hashPassword(user) ;
 	user = await new User(user).save() ; 
-	const token = jwt.sign(user.name,process.env.SECRET_KEY) ; 
+	const token = await generateToken(user) ; 
 	delete user.password ; 
 	return response.status(200)
 	.send({
