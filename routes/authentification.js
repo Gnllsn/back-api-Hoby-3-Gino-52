@@ -4,30 +4,30 @@ const User = require('../model/user') ;
 const bcrypt = require('bcryptjs');
 
 function CheckAuth(request,response,next) {
-    var token = request.headers.authorization;
-      if(!token) return response.sendStatus(401)
-      // verify token secret
-      try{
-      token = token.split(' ')[1]; 
-      jwt.verify(token,process.env.SECRET_KEY,(err,data)=>{
-        if(err) return response.sendStatus(403);
-        next();
-      });
-      }catch(err){
-      console.log(err)
-          return response.sendStatus(202) ;
-      } 
+	var token = request.headers.authorization;
+	if(!token) return response.sendStatus(401)
+	// verify token secret
+	try{
+		token = token.split(' ')[1]; 
+		jwt.verify(token,process.env.SECRET_KEY,(err,data)=>{
+			if(err) return response.sendStatus(403);
+			next();
+		});
+	}catch(err){
+		console.log(err)
+		return response.sendStatus(202) ;
+	} 
 }
 
 function checkBody(response,user){
-  if(user==null || user.name==null || user.password==null){
-    return response
-    .status(400)
-    .send({
-        status: 400 , 
-        message : "Name and Password ne peuvent être null !!!" 
-    });
-}
+	if(user==null || user.name==null || user.password==null){
+		return response
+		.status(400)
+		.send({
+			status: 400 , 
+			message : "Name and Password ne peuvent être null !!!" 
+		});
+	}
 }
 
 async function hashPassword(user){
@@ -42,7 +42,10 @@ async function findUser(user) {
 
 async function checkPassword(response,user,existant){
 	const validPassword = await bcrypt.compare(user.password,existant.password)
-	if(!validPassword) return response.status(200).send({
+	if(!validPassword)
+	return response
+	.status(200)
+	.send({
 		status : 400,
 		message : 'Mot de passe incorrect'
 	});
@@ -53,9 +56,9 @@ async function generateToken(user) {
 }
 
 async function login(request,response){
-    var user = request.body ; 
-    checkBody(response,user) ; 
-    const existant = await findUser(user);
+	var user = request.body ; 
+	checkBody(response,user) ; 
+	const existant = await findUser(user);
 	if(!existant){
 		return response
 		.status(200)
@@ -65,16 +68,19 @@ async function login(request,response){
 		});
 	}
 	await checkPassword(response,user,existant) ; 
-	const token = await generateToken(user)
-	console.log(token)
-    var result= {
-      status :  200 ,
-	  data : {
-		user : existant , 
-		token : token
-	  } 
-    } ; 
-    return response.send(result) ; 
+	if(!response.headersSent){	
+		const token = await generateToken(user)
+		console.log(token)
+		var result= {
+			status :  200 ,
+			data : {
+				user : existant , 
+				token : token
+			} 
+		} ; 
+		return response.send(result) ; 
+	}
+	
 } 
 
 async function register(request,response){
@@ -107,6 +113,6 @@ router.post('/login',login);
 router.post('/signup',register);
 
 module.exports = {
-    router,
-    CheckAuth 
+	router,
+	CheckAuth 
 } ; 
