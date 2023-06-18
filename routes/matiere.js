@@ -1,4 +1,5 @@
 let Matiere = require('../model/matiere');
+const router = require('express').Router() ; 
 
 // Récupérer tous les assignments (GET)
 function getMatieresSansPagination(req, res){
@@ -35,6 +36,7 @@ function getMatiere(req, res){
     })
 }
 
+router.get('/',getMatieres) ; 
 
-
-module.exports = { getMatieresSansPagination, getMatieres, getMatiere };
+module.exports = router ; 
+// module.exports = { getMatieresSansPagination, getMatieres, getMatiere };

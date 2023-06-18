@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "startDev" : "nodemon server.js",
+    "startDev": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm install",
     "start": "node server.js"
@@ -12,6 +12,7 @@
   "author": "Sam Orgill",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "dotenv": "^16.3.1",
     "express": "^4.17.1",
     "jsonwebtoken": "^9.0.0",

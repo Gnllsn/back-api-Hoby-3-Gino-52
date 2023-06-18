@@ -1,0 +1,89 @@
+const router = require('express').Router(); 
+const jwt = require('jsonwebtoken');
+const User = require('../model/user') ; 
+const bcrypt = require('bcryptjs');
+
+function CheckAuth(request,response,next) {
+    var token = request.headers.authorization;
+      if(!token) return response.sendStatus(401)
+      // verify token secret
+      try{
+      token = token.split(' ')[1]; 
+      jwt.verify(token,process.env.SECRET_KEY,(err,data)=>{
+        if(err) return response.sendStatus(403);
+        next();
+      });
+      }catch(err){
+      console.log(err)
+          return response.sendStatus(202) ;
+      } 
+}
+
+function checkBody(response,user){
+  if(user==null || user.name==null || user.password==null){
+    return response
+    .status(400)
+    .send({
+        status: 400 , 
+        message : "Name and Password ne peuvent être null !!!" 
+    });
+}
+}
+
+async function hashPassword(user){
+	const salt = await bcrypt.genSalt(10) ; 
+	user.password = await bcrypt.hash(user.password,salt) ;
+	return user ; 
+}
+
+async function findUser(user) {
+	return await User.findOne({name:user.name}) ; 
+}
+
+function login(request,response){
+    var user = request.body ; 
+    checkBody(response,user) ; 
+    findUser(response,user);
+    var result= {
+      status :  200 , 
+      data :  {
+        user : user , 
+        token : jwt.sign(user,process.env.SECRET_KEY)
+      }
+    } ; 
+    return response.send(result) ; 
+} 
+
+async function register(request,response){
+	let user = request.body ; 
+	checkBody(response,user) ; 
+	const existant = await findUser(user) ; 
+	if(existant) {
+		return response
+		.status(200)
+		.send({
+			status : 400 , 
+			message : "User déjà existant !!!" 
+		})
+	}
+	user = await hashPassword(user) ;
+	user = await new User(user).save() ; 
+	const token = jwt.sign(user.name,process.env.SECRET_KEY) ; 
+	delete user.password ; 
+	return response.status(200)
+	.send({
+		status: 200 , 
+		data : {
+			user : user , 
+			token : token
+		}
+	});
+}
+
+router.post('/login',login);
+router.post('/signup',register);
+
+module.exports = {
+    router,
+    CheckAuth 
+} ; 

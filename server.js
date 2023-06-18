@@ -1,15 +1,17 @@
+require('dotenv/config');
 let express = require('express');
 let app = express();
 let bodyParser = require('body-parser');
-let assignment = require('./routes/assignments');
-let matiere = require('./routes/matiere');
 
 let mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
-//mongoose.set('debug', true);
 
-// remplacer toute cette chaine par l'URI de connexion à votre propre base dans le cloud s
-const uri = 'mongodb+srv://mb:toto@cluster0.5e6cs7n.mongodb.net/assignments?retryWrites=true&w=majority';
+const routerAuth = require('./routes/authentification');
+const routerAssignments = require('./routes/assignments') ; 
+const routerMatiere = require('./routes/matiere') ; 
+
+// const uri = 'mongodb+srv://mb:toto@cluster0.5e6cs7n.mongodb.net/assignments?retryWrites=true&w=majority';
+const uri = 'mongodb+srv://rallisongino:mE4GqdppCkFEOjvC@assignement.sp9yzul.mongodb.net/assignments?retryWrites=true&w=majority';
 
 const options = {
   useNewUrlParser: true,
@@ -39,28 +41,18 @@ app.use(function (req, res, next) {
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-let port = process.env.PORT || 8010;
 
 // les routes
 const prefix = '/api';
 
-app.route(prefix + '/assignments')
-  .get(assignment.getAssignments)
-  .post(assignment.postAssignment)
-  .put(assignment.updateAssignment);
-
-app.route(prefix + '/assignments/:id')
-  .get(assignment.getAssignment)
-  .delete(assignment.deleteAssignment);
-
-app.route(prefix + '/matieres')
-  .get(matiere.getMatieres);
+app.use('/auth',routerAuth.router) ; 
+app.use(prefix,routerAuth.CheckAuth) ; 
+app.use(prefix + '/assignments' , routerAssignments) ; 
+app.use(prefix + '/matieres',routerMatiere) ; 
   
 
 // On démarre le serveur
+let port = process.env.PORT || 8010;
 app.listen(port, "0.0.0.0");
 console.log('Serveur démarré sur http://localhost:' + port);
-
 module.exports = app;
-
-

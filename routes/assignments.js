@@ -1,4 +1,5 @@
 let Assignment = require('../model/assignment');
+const router = require('express').Router() ; 
 
 // Récupérer tous les assignments (GET)
 function getAssignmentsSansPagination(req, res){
@@ -89,6 +90,11 @@ function deleteAssignment(req, res) {
     })
 }
 
+router.get('/',getAssignments)
+router.get('/:id',getAssignment)
+router.post('/',postAssignment)
+router.put('/',updateAssignment);
+router.delete('/:id' , deleteAssignment) ; 
 
-
-module.exports = { getAssignments, postAssignment, getAssignment, updateAssignment, deleteAssignment };
+// module.exports = { getAssignments, postAssignment, getAssignment, updateAssignment, deleteAssignment };
+module.exports = router ;
