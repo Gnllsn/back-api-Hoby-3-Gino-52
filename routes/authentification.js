@@ -5,11 +5,7 @@ const bcrypt = require('bcryptjs');
 
 function CheckAuth(request,response,next) {
 	var token = request.headers.authorization;
-	console.log("token",token)
-	if(!token) return response.status(401).send({
-		token : "token undefined !!!! "
-	})
-	// verify token secret
+	if(!token) return response.sendStatus(401)
 	try{
 		token = token.split(' ')[1]; 
 		jwt.verify(token,process.env.SECRET_KEY,(err,data)=>{

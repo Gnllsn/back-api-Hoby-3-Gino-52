@@ -24,7 +24,10 @@ function getAssignments(req, res) {
         if (err) {
           res.send(err);
         }
-        res.send(assignments);
+        res.send({
+            data: assignments ,
+            status: 200
+            });
       }
     );
    }

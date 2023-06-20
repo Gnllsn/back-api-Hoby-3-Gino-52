@@ -46,7 +46,7 @@ app.use(bodyParser.json());
 // les routes
 const prefix = '/api';
 app.use('/auth',routerAuth.router) ; 
-// app.use(prefix,routerAuth.CheckAuth) ; 
+app.use(prefix,routerAuth.CheckAuth) ; 
 app.use(prefix + '/assignments' , routerAssignments) ; 
 app.use(prefix + '/matieres',routerMatiere) ; 
   
