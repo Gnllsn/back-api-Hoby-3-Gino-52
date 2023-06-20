@@ -5,7 +5,10 @@ const bcrypt = require('bcryptjs');
 
 function CheckAuth(request,response,next) {
 	var token = request.headers.authorization;
-	if(!token) return response.sendStatus(401)
+	console.log("token",token)
+	if(!token) return response.status(401).send({
+		token : "token undefined !!!! "
+	})
 	// verify token secret
 	try{
 		token = token.split(' ')[1]; 
@@ -79,8 +82,7 @@ async function login(request,response){
 			} 
 		} ; 
 		return response.send(result) ; 
-	}
-	
+	}	
 } 
 
 async function register(request,response){
@@ -109,8 +111,28 @@ async function register(request,response){
 	});
 }
 
+function verifyToken(request,response){
+	var token = request.headers.authorization;
+	if(!token) return response.sendStatus(401)
+	// verify token secret
+	try{
+		token = token.split(' ')[1]; 
+		jwt.verify(token,process.env.SECRET_KEY,(err,data)=>{
+			if(err) return response.sendStatus(403);
+			else{
+				return response.status(200).send({status:200})
+			}
+		});
+	}catch(err){
+		console.log(err)
+		return response.sendStatus(202) ;
+	}
+}
+
 router.post('/login',login);
 router.post('/signup',register);
+router.post('/check',verifyToken);
+
 
 module.exports = {
 	router,
