@@ -17,7 +17,8 @@ function getMatieres(req, res) {
 
     Matiere.find((error, data) => {
         if (error) {
-            return next(error)
+            console.log(error);
+            res.send(err);
         } else {
             console.log(data)
             res.send(data)
