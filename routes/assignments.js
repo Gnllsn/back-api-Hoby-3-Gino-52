@@ -47,6 +47,8 @@ function postAssignment(req, res){
     assignment.dateDeRendu = req.body.dateDeRendu;
     assignment.rendu = req.body.rendu;
     assignment.matiere = req.body.matiere;
+    assignment.auteur = req.body.auteur;
+    assignment.prof = req.body.prof;
 
     console.log(req.body);
     console.log(req.body.matiere);
@@ -90,7 +92,56 @@ function deleteAssignment(req, res) {
     })
 }
 
+function getAssignmentsEtudiant(req, res) {
+    let columnName = 'auteur'; 
+    let columnValue = req.params.auteur; 
+  
+    var aggregateQuery = Assignment.aggregate();
+  
+    aggregateQuery.match({ [columnName]: columnValue });
+  
+    Assignment.aggregatePaginate(
+      aggregateQuery,
+      {
+        page: parseInt(req.query.page) || 1,
+        limit: parseInt(req.query.limit) || 10,
+      },
+      (err, assignments) => {
+        if (err) {
+          res.send(err);
+        }
+        res.send(assignments);
+      }
+    );
+}
+
+function getAssignmentsProf(req, res) {
+    let columnName = 'prof'; 
+    let columnValue = req.params.prof; 
+  
+    var aggregateQuery = Assignment.aggregate();
+  
+    aggregateQuery.match({ [columnName]: columnValue });
+  
+    Assignment.aggregatePaginate(
+      aggregateQuery,
+      {
+        page: parseInt(req.query.page) || 1,
+        limit: parseInt(req.query.limit) || 10,
+      },
+      (err, assignments) => {
+        if (err) {
+          res.send(err);
+        }
+        res.send(assignments);
+      }
+    );
+}
+  
+
 router.get('/',getAssignments)
+router.get('/prof/:prof',getAssignmentsProf)
+router.get('/etudiant/:auteur',getAssignmentsEtudiant)
 router.get('/:id',getAssignment)
 router.post('/',postAssignment)
 router.put('/',updateAssignment);
