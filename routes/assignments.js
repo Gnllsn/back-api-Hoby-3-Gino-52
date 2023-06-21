@@ -113,7 +113,10 @@ function getAssignmentsEtudiant(req, res) {
         if (err) {
           res.send(err);
         }
-        res.send(assignments);
+        res.send({
+            data: assignments ,
+            status: 200
+            });
       }
     );
 }
@@ -136,7 +139,10 @@ function getAssignmentsProf(req, res) {
         if (err) {
           res.send(err);
         }
-        res.send(assignments);
+        res.send({
+            data: assignments ,
+            status: 200
+            });
       }
     );
 }
